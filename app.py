@@ -80,15 +80,16 @@ def create_app():
         # Import models
         from models import calendar_model, ai_model
         
-        app.redis_client = redis_client
+        # Store Redis client in app config instead of as attribute
+        app.config['REDIS_CLIENT'] = redis_client
         
         if redis_client:
             from redis_models import create_redis_managers
-            app.data_managers = create_redis_managers(redis_client)
+            app.config['DATA_MANAGERS'] = create_redis_managers(redis_client)
             print("✓ Redis data managers initialized successfully")
         else:
             # Fallback to in-memory storage for development
-            app.data_managers = None
+            app.config['DATA_MANAGERS'] = None
             print("⚠ Using fallback storage - install Redis for full functionality")
     
     return app
