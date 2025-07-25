@@ -50,7 +50,7 @@ def create_app():
     
     # Configure CORS
     CORS(app, 
-         origins=['http://localhost:5000', 'https://*.replit.dev'],
+         origins=['https://ai-booking-agent-tfd7.onrender.com', 'https://*.replit.dev'],
          supports_credentials=True,
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
