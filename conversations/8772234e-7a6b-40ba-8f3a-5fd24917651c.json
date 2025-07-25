@@ -1,0 +1,23 @@
+{
+  "session_id": "8772234e-7a6b-40ba-8f3a-5fd24917651c",
+  "created_at": "2025-07-25T08:01:36.891188",
+  "messages": [
+    {
+      "timestamp": "2025-07-25T08:01:36.891196",
+      "user_message": "hi there",
+      "ai_response": "Hello! How can I help you today with your booking?",
+      "intent": {
+        "action": "query",
+        "title": "null",
+        "date": "null",
+        "time": "null",
+        "duration": null,
+        "description": "null",
+        "attendees": null,
+        "event_id": "null",
+        "confidence": 0.1
+      }
+    }
+  ],
+  "updated_at": "2025-07-25T08:01:36.891199"
+}

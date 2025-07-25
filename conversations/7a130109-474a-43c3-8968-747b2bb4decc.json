@@ -1,0 +1,39 @@
+{
+  "session_id": "7a130109-474a-43c3-8968-747b2bb4decc",
+  "created_at": "2025-07-25T09:10:25.959503",
+  "messages": [
+    {
+      "timestamp": "2025-07-25T09:10:25.959503",
+      "user_message": "hi there",
+      "ai_response": "Hello! How can I help you today with your booking?",
+      "intent": {
+        "action": "query",
+        "title": "No booking intent detected",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T09:10:47.617141",
+      "user_message": "i want to book an appointment for today 6 pm",
+      "ai_response": "Your appointment for today at 6 PM has been successfully booked!\n\nYou can view the event here: https://calendar.google.com/calendar/event?eid=av7n935jov1tur3l2hu809irc4",
+      "intent": {
+        "action": "create",
+        "title": "Appointment",
+        "date": "2025-07-25",
+        "time": "18:00",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.6
+      }
+    }
+  ],
+  "updated_at": "2025-07-25T09:10:47.617141"
+}

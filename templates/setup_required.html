@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Required - AI Booking Agent</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Google OAuth Setup Required
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-cog me-2"></i>Missing Configuration</h5>
+                            <p class="mb-0">Google OAuth credentials are not configured. To use the AI Booking Agent with Google Calendar, you need to set up OAuth credentials.</p>
+                        </div>
+                        
+                        <h5>Quick Setup Steps:</h5>
+                        <ol>
+                            <li><strong>Get OAuth Credentials</strong>:
+                                <ul class="mt-2">
+                                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                                    <li>Create/select a project and enable Google Calendar API</li>
+                                    <li>Create OAuth 2.0 Client credentials</li>
+                                    <li>Download the <code>credentials.json</code> file</li>
+                                </ul>
+                            </li>
+                            
+                            <li class="mt-3"><strong>Add Redirect URI</strong>:
+                                <div class="alert alert-info mt-2">
+                                    <strong>Add this redirect URI to your Google OAuth configuration:</strong><br>
+                                    <code id="redirect-uri">{{ request.url_root }}auth/callback</code>
+                                    <button class="btn btn-sm btn-outline-info ms-2" onclick="copyToClipboard()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </li>
+                            
+                            <li class="mt-3"><strong>Configure Credentials</strong>:
+                                <p>Add these values to your Replit Secrets:</p>
+                                <ul>
+                                    <li><code>GOOGLE_CLIENT_ID</code></li>
+                                    <li><code>GOOGLE_CLIENT_SECRET</code></li>
+                                </ul>
+                            </li>
+                        </ol>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <a href="/setup" class="btn btn-primary w-100">
+                                    <i class="fas fa-upload me-2"></i>
+                                    Upload credentials.json
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Back to App
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-dark rounded">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Need Help?</h6>
+                            <p class="small mb-0">
+                                Check the <a href="https://github.com/your-repo/ai-booking-agent#setup" target="_blank">setup documentation</a> 
+                                for detailed instructions or contact support if you need assistance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function copyToClipboard() {
+            const text = document.getElementById('redirect-uri').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.remove('btn-outline-info');
+                btn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-info');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

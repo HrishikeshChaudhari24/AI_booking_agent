@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Booking Agent</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-3">Initializing AI Booking Agent...</div>
+        </div>
+    </div>
+
+    <!-- Alerts Container -->
+    <div id="alerts-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-robot me-2"></i>
+                AI Booking Agent
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div id="auth-status" class="nav-item">
+                    <!-- Auth status will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        
+        <!-- Welcome Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-calendar-alt me-3"></i>
+                        AI Booking Agent
+                    </h1>
+                    <p class="lead">
+                        Schedule, reschedule, and manage your Google Calendar events using natural language
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mb-5">
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-comments feature-icon"></i>
+                        <h5 class="card-title">Natural Language</h5>
+                        <p class="card-text">Just tell me what you need to schedule in plain English</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-check feature-icon"></i>
+                        <h5 class="card-title">Smart Scheduling</h5>
+                        <p class="card-text">Automatic conflict detection and alternative suggestions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fab fa-google feature-icon"></i>
+                        <h5 class="card-title">Google Calendar</h5>
+                        <p class="card-text">Direct integration with your Google Calendar account</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p class="card-text">OAuth2 authentication and secure session management</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login-section" class="row justify-content-center" style="display: none;">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body auth-section">
+                        <h3 class="mb-4">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Connect Your Calendar
+                        </h3>
+                        <p class="mb-4">
+                            To get started, please connect your Google Calendar account. 
+                            This allows the AI to manage your events securely.
+                        </p>
+                        <button id="login-btn" class="btn btn-primary btn-lg">
+                            <i class="fab fa-google me-2"></i>
+                            Connect Google Calendar
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-lock me-1"></i>
+                                Your data is secure and private
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div id="chat-section" class="row justify-content-center" style="display: none;">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-comments me-2"></i>
+                            Chat with AI Assistant
+                        </h5>
+                        <div>
+                            <button id="clear-chat-btn" class="btn btn-sm btn-outline-secondary me-2" title="Clear conversation">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button id="test-connection-btn" class="btn btn-sm btn-outline-info" title="Test calendar connection">
+                                <i class="fas fa-plug"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="card-body border-bottom">
+                        <div class="quick-actions">
+                            <button class="btn btn-outline-primary quick-action-btn" data-action="schedule">
+                                <i class="fas fa-plus me-1"></i>Schedule Meeting
+                            </button>
+                            <button class="btn btn-outline-warning quick-action-btn" data-action="reschedule">
+                                <i class="fas fa-edit me-1"></i>Reschedule
+                            </button>
+                            <button class="btn btn-outline-danger quick-action-btn" data-action="cancel">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button class="btn btn-outline-info quick-action-btn" data-action="upcoming">
+                                <i class="fas fa-list me-1"></i>Show Upcoming
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Container -->
+                    <div class="chat-container">
+                        <div id="chat-messages"></div>
+                        
+                        <!-- Chat Input -->
+                        <div class="chat-input">
+                            <div class="input-group">
+                                <textarea 
+                                    id="message-input" 
+                                    class="form-control" 
+                                    placeholder="Type your message here... (e.g., 'Schedule a team meeting for tomorrow at 2 PM')"
+                                    rows="1"
+                                ></textarea>
+                                <button id="send-btn" class="btn btn-primary" type="button" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Try: "Schedule a team meeting tomorrow at 2 PM" or "What meetings do I have next week?"
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Example Commands</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-calendar-plus text-success me-2"></i>
+                                    Schedule Events
+                                </h6>
+                                <ul class="list-unstyled small">
+                                    <li>"Schedule a team meeting tomorrow at 2 PM"</li>
+                                    <li>"Book a client call for Friday afternoon"</li>
+                                    <li>"Set up a project review next Tuesday at 10 AM"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-calendar-times text-warning me-2"></i>
+                                    Manage Events
+                                </h6>
+                                <ul class="list-unstyled small">
+                                    <li>"Reschedule my meeting to 3 PM"</li>
+                                    <li>"Cancel the team standup tomorrow"</li>
+                                    <li>"Show me my meetings for next week"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">
+                        <i class="fas fa-robot me-2"></i>
+                        AI Booking Agent - Powered by Gemini AI and Google Calendar
+                    </p>
+                    <small class="text-muted">
+                        Built with Flask, LangChain, and Google APIs
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

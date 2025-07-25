@@ -1,0 +1,78 @@
+Create a production-ready Streamlit app called **"AI Booking Agent"** using the **MVC architecture** and good system design principles.
+
+**Key Features:**
+
+1️⃣ **AI Orchestration**  
+- Use **LangChain** to manage conversation flow.  
+- Use **Gemini LLM** (via `google-generativeai` or `Vertex AI`) to interpret user queries.  
+- Gemini should extract:
+   - Intent (book, reschedule, cancel)
+   - Date, time, participants, meeting description
+
+2️⃣ **Natural Language Interface**  
+- Streamlit UI should have a clean, chat-like input box for the user to type requests.  
+- Show AI’s response + booking status.
+
+3️⃣ **Google Calendar Integration**  
+- Prompt the user to **connect their Google Calendar** using OAuth2.  
+- Use `google-auth` and `google-api-python-client`.  
+- Persist the authenticated session securely (e.g., via cookies or a secure session store).
+
+4️⃣ **Booking Actions**  
+- Create new events in the user’s calendar.  
+- Check for conflicts — if there’s a clash, Gemini suggests the next available slot.  
+- Reschedule or cancel events as requested.  
+- After booking, show:
+   - Confirmation message
+   - Event details (title, time, participants)
+   - Direct link to open the event in Google Calendar
+
+5️⃣ **Session Management**  
+- Store conversation context using LangChain’s Memory.  
+- Persist user session across page reloads.  
+- Handle expired tokens gracefully (re-authenticate if needed).
+
+6️⃣ **MVC Architecture**  
+- Use **controllers** for business logic (booking, rescheduling, conflict checking)  
+- Use **models** for interacting with Google Calendar API & Gemini  
+- Use **views** for Streamlit pages / UI components  
+- Organize into separate modules:
+   - `controllers/booking_controller.py`
+   - `models/calendar_model.py`
+   - `models/ai_model.py`
+   - `views/chat_ui.py`
+   - `main.py` or `app.py` as entry point
+
+7️⃣ **Production Readiness**  
+- Use `.env` file for secrets (API keys, OAuth credentials) — don’t hardcode.  
+- Add proper error handling & logging.  
+- Handle multiple user sessions correctly (use Streamlit’s `st.session_state` or a secure backend session store).  
+- Include instructions for setting up Google OAuth client credentials & callback URLs for Replit deployment.
+
+8️⃣ **Deployment**  
+- Should run with `streamlit run main.py`.  
+- Create a `requirements.txt` with:
+   - `streamlit`
+   - `langchain`
+   - `google-generativeai` or `vertexai`
+   - `google-auth`
+   - `google-api-python-client`
+   - `python-dotenv`
+
+9️⃣ **Comments & Docs**  
+- Add clear comments explaining each module and function.  
+- Provide a `README.md` explaining:
+   - How to set up OAuth credentials
+   - How to run locally or on Replit
+   - How to deploy
+
+---
+
+**Output:**
+✅ Organized folder structure, not a single big file.  
+✅ MVC pattern: `controllers/`, `models/`, `views/`.  
+✅ Config files for secrets.  
+✅ Runs on Replit with `streamlit run`.
+
+---
+
