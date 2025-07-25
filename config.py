@@ -16,7 +16,7 @@ class Config:
     if REPLIT_URL:
         GOOGLE_REDIRECT_URI = f'https://{REPLIT_URL}/auth/callback'
     else:
-        # GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'https://ai-booking-agent-tfd7.onrender.com/auth/callback')
+        GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'https://ai-booking-agent-tfd7.onrender.com/auth/callback')
           # GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'https://ai-booking-agent-tfd7.onrender.com/auth/callback')
     
     # Gemini API configuration
