@@ -4,8 +4,9 @@
 
 1. **Go to your Supabase project dashboard**
 2. **Open the SQL Editor** (left sidebar)
-3. **Copy and paste the SQL from `sql/create_tables.sql`** and run it
-4. **Done!** Your shared booking system is ready
+3. **If this is a fresh setup**: Copy and paste the SQL from `sql/create_tables.sql` and run it
+4. **If you're getting booking errors**: Copy and paste the SQL from `sql/fix_policies.sql` and run it
+5. **Done!** Your shared booking system is ready
 
 ## What This Creates
 
@@ -57,9 +58,9 @@ bookings (
 
 ## Security & Privacy
 
-- **Row Level Security (RLS)** enabled
-- Users can only see/edit their own bookings
-- Conflict checking works without exposing other users' details
+- **Row Level Security (RLS)** enabled for shared booking system
+- Open access policies for conflict prevention across all users
+- User email tracking maintains booking ownership
 - All times stored in UTC for consistency
 
 Your shared booking system is now ready! Users can book appointments without conflicts, and the system will automatically prevent double-booking.

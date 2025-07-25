@@ -65,7 +65,119 @@
         "event_id": null,
         "confidence": 1.0
       }
+    },
+    {
+      "timestamp": "2025-07-25T11:05:15.413803",
+      "user_message": "show my appointments",
+      "ai_response": "I've checked again, and it appears there are no upcoming appointments currently showing in your schedule. I apologize for the inconvenience, especially since you recently booked an appointment for July 26, 2025, at 12:30 AM IST. It seems there might be a persistent issue retrieving your events. Is there anything else I can assist you with right now?",
+      "intent": {
+        "action": "query",
+        "title": "appointments",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:05:38.922710",
+      "user_message": "i want to book an appointment",
+      "ai_response": "Certainly, I can help you book an appointment! To do that, I'll need to know the date and time you'd like to schedule it for. Could you please provide those details?",
+      "intent": {
+        "action": "create",
+        "title": "appointment",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.5
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:06:12.572988",
+      "user_message": "today 6 pm haircut",
+      "ai_response": "I'm sorry, but the 6 PM slot for a haircut today (July 25th) is unavailable. It conflicts with another appointment you have scheduled later tonight at 11:30 PM.\n\nHowever, I can offer a few alternatives that might work:\n*   Today, July 25th, at 3:00 PM\n*   Today, July 25th, at 10:30 AM\n*   Monday, July 28th, at 11:00 AM\n\nWould any of these times work for you, or would you like to explore other options?",
+      "intent": {
+        "action": "create",
+        "title": "haircut",
+        "date": "today",
+        "time": "6 pm",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:07:34.747472",
+      "user_message": "ok book for tomorrow 3pm",
+      "ai_response": "I apologize, but I was unable to book the appointment for tomorrow at 3 PM due to an issue with our shared booking system.\n\nWould you like to try another time, or is there anything else I can assist you with?",
+      "intent": {
+        "action": "create",
+        "title": "haircut",
+        "date": "2025-07-26",
+        "time": "3pm",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:08:00.164674",
+      "user_message": "ok book for sunday 3pm",
+      "ai_response": "I'm sorry, but I was unable to book your appointment for Sunday at 3 PM. It seems we're experiencing a persistent issue with our shared booking system at the moment.\n\nWould you like to try another time, or is there anything else I can assist you with?",
+      "intent": {
+        "action": "create",
+        "title": "haircut",
+        "date": "2025-07-27",
+        "time": "3pm",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:08:56.163603",
+      "user_message": "do you have any suggestions",
+      "ai_response": "I apologize, it seems we're still encountering persistent issues with our booking system, which is why I haven't been able to secure your recent appointments.\n\nAt the moment, I'm unable to provide alternative booking slots or suggestions due to these technical difficulties. I recommend trying again a bit later, or perhaps tomorrow, as we work to resolve this.\n\nI'm truly sorry for the inconvenience this has caused.",
+      "intent": {
+        "action": "create",
+        "title": "haircut",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.9
+      }
+    },
+    {
+      "timestamp": "2025-07-25T11:10:59.843209",
+      "user_message": "i want to book an appointment for today 5 pm",
+      "ai_response": "I'm sorry, but I was unable to book your appointment for today at 5 PM. It seems we're still experiencing a persistent issue with our shared booking system at the moment.\n\nUnfortunately, due to these technical difficulties, I can't offer alternative booking slots right now. I apologize for the inconvenience this has caused.",
+      "intent": {
+        "action": "create",
+        "title": "appointment",
+        "date": "today",
+        "time": "5 pm",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.9
+      }
     }
   ],
-  "updated_at": "2025-07-25T10:47:57.020321"
+  "updated_at": "2025-07-25T11:10:59.843219"
 }

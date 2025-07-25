@@ -39,31 +39,25 @@ CREATE TRIGGER update_bookings_updated_at
 -- Enable Row Level Security (RLS)
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 
--- Create policy so users can only see their own bookings
--- Note: For shared booking system, you might want to adjust this
-CREATE POLICY "Users can view their own bookings" ON bookings
-    FOR SELECT USING (auth.email() = user_email);
+-- Create policies for shared booking system
+-- Allow anon users to manage bookings for the shared system
 
-CREATE POLICY "Users can insert their own bookings" ON bookings
-    FOR INSERT WITH CHECK (auth.email() = user_email);
+-- Allow anyone to view bookings (needed for conflict checking)
+CREATE POLICY "Allow read access for conflict checking" ON bookings
+    FOR SELECT USING (true);
 
-CREATE POLICY "Users can update their own bookings" ON bookings
-    FOR UPDATE USING (auth.email() = user_email);
+-- Allow anyone to insert bookings
+CREATE POLICY "Allow insert for shared booking" ON bookings
+    FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Users can delete their own bookings" ON bookings
-    FOR DELETE USING (auth.email() = user_email);
+-- Allow anyone to update bookings
+CREATE POLICY "Allow update for shared booking" ON bookings
+    FOR UPDATE USING (true);
 
--- For the shared booking conflict checking, create a public view
--- that allows checking time conflicts without exposing user details
-CREATE OR REPLACE VIEW booking_time_slots AS
-SELECT 
-    id,
-    start_time,
-    end_time,
-    duration_minutes,
-    status
-FROM bookings
-WHERE status = 'confirmed';
+-- Allow anyone to delete bookings  
+CREATE POLICY "Allow delete for shared booking" ON bookings
+    FOR DELETE USING (true);
 
--- Allow public access to the view for conflict checking
-GRANT SELECT ON booking_time_slots TO anon, authenticated;
+-- Grant necessary permissions to anon and authenticated users
+GRANT ALL ON bookings TO anon, authenticated;
+GRANT USAGE ON SEQUENCE bookings_id_seq TO anon, authenticated;
