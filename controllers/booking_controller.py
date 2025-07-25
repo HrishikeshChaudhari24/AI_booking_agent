@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, session, jsonify
 from models.calendar_model import CalendarModel
 from models.ai_model import AIModel
+from models.booking_model import BookingModel
 from services.session_service import SessionService
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,14 @@ def get_calendar_model() -> CalendarModel:
 def get_ai_model() -> AIModel:
     """Get AI model instance"""
     return AIModel()
+
+def get_booking_model() -> BookingModel:
+    """Get booking model instance"""
+    try:
+        return BookingModel()
+    except ValueError as e:
+        logger.error(f"Failed to initialize booking model: {e}")
+        raise
 
 @booking_bp.route('/process', methods=['POST'])
 def process_booking_request():
@@ -39,6 +48,7 @@ def process_booking_request():
         # Get models
         ai_model = get_ai_model()
         calendar_model = get_calendar_model()
+        booking_model = get_booking_model()
         
         # Get conversation context
         context = SessionService.get_conversation_context(session.get('session_id', ''))
@@ -49,15 +59,18 @@ def process_booking_request():
         
         booking_result = None
         
+        # Get user email for booking system
+        user_email = session.get('user_email', 'anonymous@example.com')
+        
         # Process based on intent
         if intent.action == 'create':
-            booking_result = handle_create_event(calendar_model, intent)
+            booking_result = handle_create_event(calendar_model, booking_model, intent, user_email)
         elif intent.action == 'reschedule':
             booking_result = handle_reschedule_event(calendar_model, intent)
         elif intent.action == 'cancel':
             booking_result = handle_cancel_event(calendar_model, intent)
         elif intent.action == 'query':
-            booking_result = handle_query_events(calendar_model, intent)
+            booking_result = handle_query_events(calendar_model, booking_model, intent, user_email)
         else:
             booking_result = {'error': 'Unknown action requested'}
         
@@ -90,7 +103,7 @@ def process_booking_request():
         logger.error(f"Booking request error: {e}")
         return jsonify({'error': 'Failed to process booking request'}), 500
 
-def handle_create_event(calendar_model: CalendarModel, intent) -> dict:
+def handle_create_event(calendar_model: CalendarModel, booking_model: BookingModel, intent, user_email: str) -> dict:
     """Handle event creation"""
     try:
         if not intent.title:
@@ -107,7 +120,26 @@ def handle_create_event(calendar_model: CalendarModel, intent) -> dict:
         
         end_datetime = start_datetime + timedelta(minutes=intent.duration or 60)
         
-        # Check availability
+        # Check availability in shared booking system first
+        if not booking_model.check_time_slot_availability(start_datetime, end_datetime):
+            # Get conflicting bookings from shared system
+            conflicts = booking_model.get_conflicting_bookings(start_datetime, end_datetime)
+            alternative = booking_model.find_next_available_slot(start_datetime, intent.duration or 60)
+            
+            conflict_details = []
+            for conflict in conflicts:
+                conflict_details.append(f"- {conflict.get('title', 'Appointment')} from {conflict.get('start_time')} to {conflict.get('end_time')}")
+            
+            conflict_message = "\n".join(conflict_details) if conflict_details else "Time slot is already booked by another user."
+            
+            return {
+                'conflict': True,
+                'message': f"Time slot not available. Conflicting bookings:\n{conflict_message}",
+                'alternative_time': alternative.isoformat() if alternative else None,
+                'conflicts': conflicts
+            }
+        
+        # Also check user's personal Google Calendar
         if not calendar_model.check_availability(start_datetime, end_datetime):
             # Find alternative slots
             alternative = calendar_model.find_next_available_slot(start_datetime, intent.duration or 60)
@@ -129,7 +161,7 @@ def handle_create_event(calendar_model: CalendarModel, intent) -> dict:
                 'conflicts': conflicts
             }
         
-        # Create event
+        # Create event in Google Calendar
         event = calendar_model.create_event(
             title=intent.title,
             start_time=start_datetime,
@@ -139,14 +171,35 @@ def handle_create_event(calendar_model: CalendarModel, intent) -> dict:
         )
         
         if event:
-            return {
-                'success': True,
-                'event': event,
-                'message': f"Event '{intent.title}' created successfully",
-                'calendar_link': f"https://calendar.google.com/calendar/event?eid={event.get('id', '')}"
-            }
+            # Also create booking in shared system
+            booking = booking_model.create_booking(
+                user_email=user_email,
+                title=intent.title,
+                start_time=start_datetime,
+                end_time=end_datetime,
+                description=intent.description or "",
+                google_event_id=event.get('id')
+            )
+            
+            if booking:
+                return {
+                    'success': True,
+                    'event': event,
+                    'booking': booking,
+                    'message': f"Appointment '{intent.title}' booked successfully for {intent.duration or 60} minutes",
+                    'calendar_link': f"https://calendar.google.com/calendar/event?eid={event.get('id', '')}"
+                }
+            else:
+                # If shared booking fails, try to clean up the Google Calendar event
+                try:
+                    event_id = event.get('id')
+                    if event_id:
+                        calendar_model.delete_event(event_id)
+                except:
+                    pass
+                return {'error': 'Failed to secure booking in shared system'}
         else:
-            return {'error': 'Failed to create event'}
+            return {'error': 'Failed to create calendar event'}
             
     except Exception as e:
         logger.error(f"Create event error: {e}")
@@ -235,20 +288,52 @@ def handle_cancel_event(calendar_model: CalendarModel, intent) -> dict:
         logger.error(f"Cancel event error: {e}")
         return {'error': 'Failed to cancel event'}
 
-def handle_query_events(calendar_model: CalendarModel, intent) -> dict:
+def handle_query_events(calendar_model: CalendarModel, booking_model: BookingModel, intent, user_email: str) -> dict:
     """Handle event queries"""
     try:
+        # Get events from both sources
         if intent.title:
-            # Search for specific events
-            events = calendar_model.search_events(intent.title)
+            # Search for specific events in shared bookings
+            shared_bookings = booking_model.search_bookings(user_email, intent.title)
+            # Also search in Google Calendar
+            calendar_events = calendar_model.search_events(intent.title)
         else:
-            # Get upcoming events
-            events = calendar_model.get_upcoming_events(10)
+            # Get upcoming events from shared bookings
+            shared_bookings = booking_model.get_upcoming_bookings(user_email, 10)
+            # Also get from Google Calendar
+            calendar_events = calendar_model.get_upcoming_events(10)
+        
+        # Combine and format events
+        all_events = []
+        
+        # Add shared bookings
+        for booking in shared_bookings:
+            all_events.append({
+                'id': booking.get('id'),
+                'summary': booking.get('title'),
+                'description': booking.get('description', ''),
+                'start': {'dateTime': booking.get('start_time')},
+                'end': {'dateTime': booking.get('end_time')},
+                'source': 'shared_booking',
+                'duration_minutes': booking.get('duration_minutes', 60)
+            })
+        
+        # Add Google Calendar events (avoid duplicates)
+        google_event_ids = [b.get('google_event_id') for b in shared_bookings if b.get('google_event_id')]
+        for event in calendar_events:
+            if event.get('id') not in google_event_ids:
+                all_events.append({
+                    **event,
+                    'source': 'google_calendar'
+                })
+        
+        # Sort by start time
+        all_events.sort(key=lambda x: x.get('start', {}).get('dateTime', ''))
         
         return {
             'success': True,
-            'events': events,
-            'message': f"Found {len(events)} events"
+            'events': all_events,
+            'message': f"Found {len(all_events)} appointments"
         }
         
     except Exception as e:

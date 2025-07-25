@@ -83,7 +83,17 @@ def oauth_callback():
         }
         
         session['authenticated'] = True
-        logger.info("User authenticated successfully")
+        
+        # Get user info from Google to store email
+        try:
+            from googleapiclient.discovery import build
+            service = build('oauth2', 'v2', credentials=credentials)
+            user_info = service.userinfo().get().execute()
+            session['user_email'] = user_info.get('email', 'anonymous@example.com')
+            logger.info(f"User authenticated successfully: {session['user_email']}")
+        except Exception as e:
+            logger.warning(f"Could not get user info: {e}")
+            session['user_email'] = 'anonymous@example.com'
         
         return render_template('auth_callback.html')
         

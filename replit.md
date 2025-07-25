@@ -4,12 +4,15 @@
 
 The AI Booking Agent is a production-ready Flask-based web application that provides an intelligent calendar management system. It combines natural language processing with Google Calendar integration to allow users to manage their calendar events through conversational AI. The application uses Google's Gemini AI model via LangChain for intent extraction and conversation management, with Redis for data storage, providing users with a seamless booking experience through natural language interactions.
 
-## Recent Changes (January 25, 2025)
+## Recent Changes (July 25, 2025)
 
-✓ **Migrated from PostgreSQL to Redis for data storage** - Complete architectural change to use Redis for sessions, user data, conversations, and calendar events
-✓ **Added Redis data managers** - Created comprehensive Redis-based storage with automatic expiration and efficient key management
-✓ **Updated session management** - Replaced Flask-Session with Redis-based session service for better scalability
-✓ **Created local setup documentation** - Added detailed LOCAL_SETUP.md with step-by-step instructions for running locally
+✓ **Migrated to Replit environment** - Successfully adapted from Replit Agent to standard Replit deployment
+✓ **Added Supabase shared booking system** - Prevents double-booking across all users with variable duration support
+✓ **Fixed time zone parsing issues** - Proper handling of user input like "7pm today" converts correctly to 19:00
+✓ **Enhanced conflict detection** - Shows conflicting bookings and suggests alternative time slots
+✓ **Integrated dual storage** - Uses both Supabase (shared bookings) and Google Calendar (personal events)
+✓ **Added user email tracking** - Proper user identification for multi-user booking system
+✓ **Created setup documentation** - SUPABASE_SETUP.md with simple SQL setup instructions
 
 ## User Preferences
 
@@ -76,11 +79,13 @@ Preferred communication style: Simple, everyday language.
 - Offline access for persistent authentication
 
 ### Data Storage Architecture
-- **Redis-based storage** with structured key namespacing (`ai_booking:type:identifier`)
-- **Automatic expiration**: Sessions (24h), conversations (7 days), calendar events (90 days), users (30 days)
-- **Conversation context persistence** across browser sessions with message history
+- **Supabase PostgreSQL** for shared booking management with conflict prevention
+- **Google Calendar API** for personal calendar integration and event synchronization
+- **Session storage** via filesystem (Redis fallback) for user authentication
+- **Row Level Security (RLS)** ensures users only access their own bookings
+- **Dual storage sync** - bookings stored in both Supabase and Google Calendar
 - **OAuth credential management** with secure token refresh handling
-- **User profile storage** with Google account integration
+- **User email tracking** for multi-user booking identification
 
 ## Deployment Strategy
 
