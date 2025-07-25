@@ -41,17 +41,26 @@ class AIModel:
             Determine the action: 'create', 'reschedule', 'cancel', or 'query'
             Extract details like title, date, time, duration, description, and attendees.
             
-            For dates, accept various formats and convert to YYYY-MM-DD format.
-            For times, accept various formats and convert to HH:MM format (24-hour).
+            For dates:
+            - "today" should remain as "today" 
+            - "tomorrow" should be converted to next day in YYYY-MM-DD format
+            - Specific dates should be in YYYY-MM-DD format
+            
+            For times:
+            - Keep original format (7pm, 7:00 PM, 19:00) - DO NOT convert to 24-hour
+            - Preserve AM/PM indicators when present
+            - If no AM/PM specified for times 1-12, assume user's intended time
+            
+            For queries about "appointments", "meetings", "events" - use action "query"
             
             If information is missing or unclear, set confidence lower.
             
             Return JSON matching this structure:
             {
                 "action": "create|reschedule|cancel|query",
-                "title": "event title",
-                "date": "YYYY-MM-DD or null",
-                "time": "HH:MM or null", 
+                "title": "event title or inferred title",
+                "date": "today|YYYY-MM-DD or null",
+                "time": "original format (7pm, 2:30 PM, etc.) or null", 
                 "duration": 60,
                 "description": "event description or null",
                 "attendees": ["email1@example.com"] or null,
@@ -186,19 +195,81 @@ class AIModel:
             return "Let me help you find an alternative time that works better."
     
     def parse_datetime(self, date_str: str, time_str: str) -> Optional[datetime]:
-        """Parse date and time strings into datetime object"""
+        """Parse date and time strings into datetime object with proper timezone handling"""
         try:
             if not date_str or not time_str:
                 return None
                 
-            # Parse date
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+            # Handle "today" keyword
+            if date_str.lower() == 'today':
+                date_obj = datetime.now().date()
+            else:
+                # Parse date
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
             
-            # Parse time
-            time_obj = datetime.strptime(time_str, '%H:%M').time()
+            # Parse time - handle both 12hr and 24hr formats
+            time_str = time_str.strip().lower()
             
-            # Combine
-            return datetime.combine(date_obj, time_obj)
+            # Convert 12-hour format to 24-hour
+            if 'pm' in time_str:
+                time_str = time_str.replace('pm', '').strip()
+                if ':' in time_str:
+                    hour, minute = map(int, time_str.split(':'))
+                else:
+                    hour, minute = int(time_str), 0
+                if hour != 12:
+                    hour += 12
+                time_obj = datetime.strptime(f"{hour:02d}:{minute:02d}", '%H:%M').time()
+            elif 'am' in time_str:
+                time_str = time_str.replace('am', '').strip()
+                if ':' in time_str:
+                    hour, minute = map(int, time_str.split(':'))
+                else:
+                    hour, minute = int(time_str), 0
+                if hour == 12:
+                    hour = 0
+                time_obj = datetime.strptime(f"{hour:02d}:{minute:02d}", '%H:%M').time()
+            else:
+                # Handle formats like "7pm", "19", "19:00"
+                if time_str.endswith('pm'):
+                    time_str = time_str[:-2].strip()
+                    if ':' in time_str:
+                        hour, minute = map(int, time_str.split(':'))
+                    else:
+                        hour, minute = int(time_str), 0
+                    if hour != 12:
+                        hour += 12
+                    time_obj = datetime.strptime(f"{hour:02d}:{minute:02d}", '%H:%M').time()
+                elif time_str.endswith('am'):
+                    time_str = time_str[:-2].strip()
+                    if ':' in time_str:
+                        hour, minute = map(int, time_str.split(':'))
+                    else:
+                        hour, minute = int(time_str), 0
+                    if hour == 12:
+                        hour = 0
+                    time_obj = datetime.strptime(f"{hour:02d}:{minute:02d}", '%H:%M').time()
+                else:
+                    # Assume 24-hour format or plain number
+                    if ':' in time_str:
+                        time_obj = datetime.strptime(time_str, '%H:%M').time()
+                    else:
+                        # Single number - could be hour (assume PM if 1-12, otherwise 24hr)
+                        hour = int(time_str)
+                        if 1 <= hour <= 12:
+                            # Assume PM for afternoon hours if no AM/PM specified
+                            hour = hour + 12 if hour != 12 else hour
+                        time_obj = datetime.strptime(f"{hour:02d}:00", '%H:%M').time()
+            
+            # Combine date and time
+            dt = datetime.combine(date_obj, time_obj)
+            
+            # Ensure UTC timezone for Google Calendar API
+            from datetime import timezone
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            
+            return dt
             
         except Exception as e:
             logger.error(f"Failed to parse datetime: {e}")

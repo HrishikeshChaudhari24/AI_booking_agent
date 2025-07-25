@@ -1,0 +1,71 @@
+{
+  "session_id": "",
+  "created_at": "2025-07-25T10:45:38.623474",
+  "messages": [
+    {
+      "timestamp": "2025-07-25T10:45:38.623482",
+      "user_message": "show my appointments",
+      "ai_response": "You don't have any upcoming appointments scheduled at the moment.",
+      "intent": {
+        "action": "query",
+        "title": "appointments",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T10:46:06.308742",
+      "user_message": "i want to book an appointment for today 7 pm",
+      "ai_response": "Your appointment for 'appointment' has been successfully booked for **July 26, 2025, at 12:30 AM IST**.\n\nYou can view your event here: https://calendar.google.com/calendar/event?eid=pdvqi7vsqua1bga7rvkcaod41k",
+      "intent": {
+        "action": "create",
+        "title": "appointment",
+        "date": "2025-07-25",
+        "time": "19:00",
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 0.6
+      }
+    },
+    {
+      "timestamp": "2025-07-25T10:46:34.295702",
+      "user_message": "show my appointments",
+      "ai_response": "You recently booked an appointment for July 26, 2025, at 12:30 AM IST. However, it seems I'm currently unable to retrieve any upcoming appointments in your schedule. Would you like me to try looking again?",
+      "intent": {
+        "action": "query",
+        "title": "appointments",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "timestamp": "2025-07-25T10:47:57.020312",
+      "user_message": "show my appointments",
+      "ai_response": "I've checked again, and it appears there are no upcoming appointments currently showing in your schedule. I apologize for the inconvenience, especially since you recently booked an appointment for July 26, 2025, at 12:30 AM IST. It seems there might be a temporary issue retrieving your events. Is there anything else I can assist you with right now?",
+      "intent": {
+        "action": "query",
+        "title": "appointments",
+        "date": null,
+        "time": null,
+        "duration": null,
+        "description": null,
+        "attendees": null,
+        "event_id": null,
+        "confidence": 1.0
+      }
+    }
+  ],
+  "updated_at": "2025-07-25T10:47:57.020321"
+}
